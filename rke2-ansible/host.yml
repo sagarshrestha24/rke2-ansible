@@ -1,0 +1,26 @@
+all:
+  vars:
+    host_entries:
+      - 192.168.3.32 rke-lb.labenv.ai
+      - 192.168.2.226 rke-server1.labenv.ai
+      - 192.168.3.205 rke-server2.labenv.ai
+      - 192.168.3.44 rke-worker1.labenv.ai
+      - 192.168.2.134 rke-worker2.labenv.ai
+  hosts:
+    lb_server:
+      ansible_host: 192.168.3.32
+      ansible_user: ec2-user
+      hostname: rke-lb.labenv.ai  # Replace with your actual user on the target server
+    server1:
+      ansible_host: 192.168.3.44
+      hostname: rke-worker1.labenv.ai
+      ansible_user: ec2-user
+    server2:
+      ansible_host: 192.168.2.134
+      hostname: rke-worker2.labenv.ai
+      ansible_user: ec2-user
+    agent1:
+      ansible_host: 192.168.2.226
+      hostname: rke-server1.labenv.ai
+      ansible_user: ec2-user
+ 

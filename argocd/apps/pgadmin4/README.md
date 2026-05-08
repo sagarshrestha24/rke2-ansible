@@ -1,0 +1,116 @@
+# pgadmin4
+
+![Version: 1.31.0](https://img.shields.io/badge/Version-1.31.0-informational?style=flat-square) ![AppVersion: 8.12](https://img.shields.io/badge/AppVersion-8.12-informational?style=flat-square)
+
+pgAdmin4 is a web based administration tool for PostgreSQL database
+
+**Homepage:** <https://www.pgadmin.org/>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| rowanruseler | <rowanruseler@gmail.com> |  |
+
+## Source Code
+
+* <https://github.com/rowanruseler/helm-charts>
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| VolumePermissions.enabled | bool | `false` |  |
+| affinity | object | `{}` |  |
+| annotations | object | `{}` |  |
+| autoscaling.enabled | bool | `false` |  |
+| autoscaling.maxReplicas | int | `100` |  |
+| autoscaling.minReplicas | int | `1` |  |
+| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| commonLabels | object | `{}` |  |
+| containerPorts.http | int | `80` |  |
+| containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
+| containerSecurityContext.enabled | bool | `false` |  |
+| dnsConfig | object | `{}` |  |
+| dnsPolicy | string | `""` |  |
+| env.email | string | `"pgadmin@coreii.com"` |  |
+| env.enhanced_cookie_protection | string | `"False"` |  |
+| env.password | string | `"pgadmin@123"` |  |
+| env.variables | list | `[]` |  |
+| envVarsExtra | list | `[]` |  |
+| envVarsFromConfigMaps | list | `[]` |  |
+| envVarsFromSecrets | list | `[]` |  |
+| existingSecret | string | `"pgadmin-password"` |  |
+| extraConfigmapMounts | list | `[]` |  |
+| extraContainers | string | `""` |  |
+| extraDeploy | list | `[]` |  |
+| extraInitContainers | string | `""` |  |
+| extraSecretMounts | list | `[]` |  |
+| extraVolumeMounts | list | `[]` |  |
+| extraVolumes | list | `[]` |  |
+| image.pullPolicy | string | `"Always"` |  |
+| image.registry | string | `"docker.io"` |  |
+| image.repository | string | `"dpage/pgadmin4"` |  |
+| image.tag | string | `"8.14"` |  |
+| ingress.enabled | bool | `true` |  |
+| ingress.hosts[0].host | string | `"pgadmin4.coreii.labenv.ai"` |  |
+| ingress.hosts[0].paths[0].path | string | `"/"` |  |
+| ingress.hosts[0].paths[0].pathType | string | `"Prefix"` |  |
+| ingress.ingressClassName | string | `"nginx"` |  |
+| ingress.tls | list | `[]` |  |
+| init.resources | object | `{}` |  |
+| livenessProbe.failureThreshold | int | `3` |  |
+| livenessProbe.initialDelaySeconds | int | `30` |  |
+| livenessProbe.periodSeconds | int | `60` |  |
+| livenessProbe.successThreshold | int | `1` |  |
+| livenessProbe.timeoutSeconds | int | `15` |  |
+| namespace | string | `nil` | The name of the Namespace to deploy If not set, `.Release.Namespace` is used |
+| networkPolicy.enabled | bool | `true` |  |
+| nodeSelector | object | `{}` |  |
+| persistentVolume.accessModes[0] | string | `"ReadWriteOnce"` |  |
+| persistentVolume.annotations | object | `{}` |  |
+| persistentVolume.enabled | bool | `true` |  |
+| persistentVolume.size | string | `"2Gi"` |  |
+| podAnnotations | object | `{}` |  |
+| podLabels | object | `{}` |  |
+| priorityClassName | string | `""` |  |
+| readinessProbe.failureThreshold | int | `3` |  |
+| readinessProbe.initialDelaySeconds | int | `30` |  |
+| readinessProbe.periodSeconds | int | `60` |  |
+| readinessProbe.successThreshold | int | `1` |  |
+| readinessProbe.timeoutSeconds | int | `15` |  |
+| replicaCount | int | `1` |  |
+| resources | object | `{}` |  |
+| secretKeys.pgadminPasswordKey | string | `"password123"` |  |
+| securityContext.fsGroup | int | `5050` |  |
+| securityContext.runAsGroup | int | `5050` |  |
+| securityContext.runAsUser | int | `5050` |  |
+| serverDefinitions.enabled | bool | `true` |  |
+| serverDefinitions.existingConfigmap | string | `""` |  |
+| serverDefinitions.existingSecret | string | `"pgadmin-password"` |  |
+| serverDefinitions.resourceType | string | `"Secret"` |  |
+| serverDefinitions.servers | string | `nil` |  |
+| service.annotations | object | `{}` |  |
+| service.clusterIP | string | `""` |  |
+| service.loadBalancerIP | string | `""` |  |
+| service.port | int | `80` |  |
+| service.portName | string | `"http"` |  |
+| service.targetPort | int | `80` |  |
+| service.type | string | `"ClusterIP"` |  |
+| serviceAccount.annotations | object | `{}` |  |
+| serviceAccount.automountServiceAccountToken | bool | `false` |  |
+| serviceAccount.create | bool | `false` |  |
+| serviceAccount.name | string | `""` |  |
+| strategy | object | `{}` |  |
+| templatedPodAnnotations | string | `""` |  |
+| test.image.registry | string | `"docker.io"` |  |
+| test.image.repository | string | `"busybox"` |  |
+| test.image.tag | string | `"latest"` |  |
+| test.resources | object | `{}` |  |
+| test.securityContext.fsGroup | int | `5051` |  |
+| test.securityContext.runAsGroup | int | `5051` |  |
+| test.securityContext.runAsUser | int | `5051` |  |
+| tolerations | list | `[]` |  |
+
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

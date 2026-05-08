@@ -1,0 +1,18 @@
+suite: Test Deployment Template
+templates:
+  - deployment.yaml
+tests:
+  - it: "should render a Deployment resource"
+    asserts:
+      - isKind:
+          of: Deployment
+  - it: "should have a non-empty metadata.name"
+    asserts:
+      - notEqual:
+          path: metadata.name
+          value: ""
+  - it: "should have proper labels assigned"
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: kg-api

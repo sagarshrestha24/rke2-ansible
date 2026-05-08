@@ -1,0 +1,201 @@
+secret:
+  jwt:
+    anonKey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJyb2xlIjogImFub24iLAogICJpc3MiOiAic3VwYWJhc2UiLAogICJpYXQiOiAxNzI4OTI5NzAwLAogICJleHAiOiAxODg2Njk2MTAwCn0.0xHGoz8AJx05etWjxXMzA96k7m8W_jBfAOaQ2936VH4
+    serviceKey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJyb2xlIjogInNlcnZpY2Vfcm9sZSIsCiAgImlzcyI6ICJzdXBhYmFzZSIsCiAgImlhdCI6IDE3Mjg5Mjk3MDAsCiAgImV4cCI6IDE4ODY2OTYxMDAKfQ.9OmlKCQMzbkGHX9znqUYC8VEK8bDCEivzwnCnnGilig
+    secret: gX8jgYU4Yr3lWMevAl/D+Ak9fksNlsQsPLIXuzy7zmk=
+  smtp:
+    username: "test@gmail.com"
+    password: "test1234"
+  dashboard:
+    username: supabase
+    password: supabase
+  db:
+    username: postgres
+    password: pgpass
+    database: postgres
+  analytics:
+    apiKey: gX8jgYU4Yr3lWMevAl/D+Ak9fksNlsQsPLIXuzy7zmk=
+
+db:
+  enabled: false
+  image:
+    tag: 15.1.0.147
+  livenessProbe:
+    exec:
+      command:
+        - pg_isready
+        - -U
+        - postgres
+    initialDelaySeconds: 3
+  persistence:
+    enabled: true
+    storageClassName: longhorn
+
+studio:
+  image:
+    tag: 20240326-5e5586d
+  environment:
+    STUDIO_DEFAULT_ORGANIZATION: "My Organization"
+    STUDIO_DEFAULT_PROJECT: "My Project"
+    SUPABASE_PUBLIC_URL: http://supabase.coreii.labenv.ai/
+    NEXT_PUBLIC_ENABLE_LOGS: "true"
+  livenessProbe:
+    httpGet:
+      path: /api/profile
+      port: 3000
+    initialDelaySeconds: 3
+
+auth:
+  image:
+    tag: v2.143.0
+  environment:
+    # Override the database hostname if using external database
+    DB_HOST: postgresql-db.supabase.svc.cluster.local
+    DB_USER: supabase_auth_admin
+    DB_PORT: 5432
+    DB_PASSWORD: pgpass
+    DB_DRIVER: postgres
+    DB_SSL: disable  # disable, allow, prefer, require, verify-ca, verify-full
+    API_EXTERNAL_URL: http://supabase.coreii.labenv.ai
+    GOTRUE_API_HOST: "0.0.0.0"
+    GOTRUE_API_PORT: "9999"
+    GOTRUE_SITE_URL: http://supabase.coreii.labenv.ai
+    GOTRUE_URI_ALLOW_LIST: "*"
+    GOTRUE_DISABLE_SIGNUP: "false"
+    GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+    GOTRUE_JWT_ADMIN_ROLES: service_role
+    GOTRUE_JWT_AUD: authenticated
+    GOTRUE_JWT_EXP: "3600"
+    GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+    GOTRUE_MAILER_AUTOCONFIRM: "true"
+    GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
+    GOTRUE_SMTP_MAX_FREQUENCY: 1s
+    GOTRUE_SMTP_ADMIN_EMAIL: "test@gmail.com"
+    GOTRUE_SMTP_HOST: "smtp.gmail.com"
+    GOTRUE_SMTP_PORT: "587"
+    GOTRUE_SMTP_SENDER_NAME: "test@gmail.com"
+    GOTRUE_EXTERNAL_PHONE_ENABLED: "false"
+    GOTRUE_SMS_AUTOCONFIRM: "false"
+    GOTRUE_MAILER_URLPATHS_INVITE: "/auth/v1/verify"
+    GOTRUE_MAILER_URLPATHS_CONFIRMATION: "/auth/v1/verify"
+    GOTRUE_MAILER_URLPATHS_RECOVERY: "/auth/v1/verify"
+    GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: "/auth/v1/verify"
+
+rest:
+  image:
+    tag: v12.0.1
+
+realtime:
+  environment:
+    # Override the database hostname if using external database
+    DB_HOST: postgresql-db.supabase.svc.cluster.local
+    DB_USER: supabase_admin
+    DB_PORT: 5432
+    DB_DRIVER: postgres
+    DB_SSL: disable
+  image:
+    tag: v2.27.5
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 4000
+    initialDelaySeconds: 3
+
+meta:
+  image:
+    tag: v0.80.0
+
+storage:
+  environment:
+    # Override the database hostname if using external database
+    DB_HOST: postgresql-db.supabase.svc.cluster.local
+    DB_USER: supabase_storage_admin
+    DB_PORT: 5432
+    DB_DRIVER: postgres
+    DB_SSL: disable
+  image:
+    tag: v0.46.4
+  livenessProbe:
+    httpGet:
+      path: /status
+      port: 5000
+    initialDelaySeconds: 3
+  persistence:
+    enabled: false
+    storageClassName: longhorn
+
+imgproxy:
+  image:
+    tag: v3.8.0
+  environment:
+    IMGPROXY_ENABLE_WEBP_DETECTION: "true"
+  livenessProbe:
+    exec:
+      command:
+        - imgproxy
+        - health
+    initialDelaySeconds: 3
+  persistence:
+    enabled: false
+    storageClassName: longhorn
+
+kong:
+  image:
+    repository: kong
+    tag: 2.8.1
+  environment:
+    KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
+    KONG_LOG_LEVEL: info
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    tls: []
+    hosts:
+      - host: supabase.coreii.labenv.ai
+        paths:
+          - path: /
+            pathType: Prefix
+  service:
+    type: NodePort
+    nodePort: 32689
+
+
+analytics:
+  environment:
+    DB_HOST: postgresql-db.supabase.svc.cluster.local
+    DB_USERNAME: supabase_admin
+    DB_PORT: 5432
+    DB_DRIVER: postgres
+    DB_SCHEMA: _analytics
+  image:
+    tag: 1.4.0
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 4000
+    initialDelaySeconds: 3
+
+vector:
+  image:
+    tag: 0.34.0-alpine
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 9001
+    initialDelaySeconds: 3
+  ## Vector requires logs from the control plane to function.
+  ## This is normally stored in /var/log/pods
+  ## Modify these values according to your environment.
+  volumeMounts:
+    - name: pod-logs
+      mountPath: /var/log/pods
+  volumes:
+    - name: pod-logs
+      hostPath:
+        path: /var/log/pods
+
+functions:
+  image:
+    tag: v1.41.2

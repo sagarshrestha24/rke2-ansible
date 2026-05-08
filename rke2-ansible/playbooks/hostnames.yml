@@ -1,0 +1,17 @@
+- name: Configure hostnames and update /etc/hosts
+  hosts: all
+  become: true  # Use sudo for elevated privileges
+
+  tasks:
+    - name: Set the hostname
+      ansible.builtin.hostname:
+        name: "{{ hostname }}"
+    
+    - name: Add host entries to /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "{{ item }}"
+        create: yes
+        state: present
+      loop: "{{ host_entries }}"
+

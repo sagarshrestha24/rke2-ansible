@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: supabase
+  namespace: argocd
+spec:
+  destination:
+    name: ''
+    namespace: supabase
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: argocd/apps/supabase/
+    repoURL: 'git@github.com:01cloud/inl-infra.git'
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+        - values.dev.yaml
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+

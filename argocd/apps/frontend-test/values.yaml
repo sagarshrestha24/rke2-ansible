@@ -1,0 +1,77 @@
+# -- Number of replicas for the deployment
+replicaCount: 1  
+
+image:
+  # -- Container image repository
+  repository: savannah.ornl.gov/kdi/coreii-data-lake/frontend_dev  
+  # -- Always pull the latest image when deploying
+  pullPolicy: Always  
+  # -- Image tag to use; defaults to "latest"
+  tag: "latest"  
+
+imagePullSecrets: 
+  # -- Secret used for pulling the image from a private registry
+  - name: savannah-creds  
+
+service:
+  # -- Type of Kubernetes service (ClusterIP means internal communication only)
+  type: ClusterIP  
+  # -- Port exposed for internal cluster communication
+  port: 80  
+  # -- Port on the container to forward traffic to
+  targetport: 8080  
+
+ingress:
+  # -- Enables Ingress for external access
+  enabled: true  
+  annotations: 
+    # -- Ensures proper URL routing
+    nginx.ingress.kubernetes.io/rewrite-target: /  
+  hosts:
+    - host: coreii-chat-test.caiser.ornlkdi.org  
+      paths:
+        - path: /
+          # -- Matches all paths under "/"
+          pathType: Prefix  
+  tls: []  
+  # -- TLS configuration (currently empty, but can be configured as needed)
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local  
+
+resources:
+    requests:
+        # -- Minimum CPU requested for the pod
+        cpu: "100m"  
+        # -- Minimum memory requested for the pod
+        memory: "128Mi"  
+    limits:
+       # -- Maximum CPU allocated per pod
+       cpu: "200m"  
+       # -- Maximum memory allocated per pod
+       memory: "256Mi"  
+
+# -- Enables Pod Disruption Budget to prevent excessive pod disruptions
+pdb:
+  enabled: true  
+
+autoscaling:
+  # -- Enables Horizontal Pod Autoscaler
+  enabled: true  
+  # -- Minimum number of replicas
+  minReplicas: 1  
+  # -- Maximum number of replicas
+  maxReplicas: 10  
+  # -- Scale up/down based on CPU utilization threshold
+  targetCPUUtilizationPercentage: 80  
+  # -- Scale up/down based on memory utilization threshold
+  targetMemoryUtilizationPercentage: 80  
+
+
+serviceAccount:
+  # -- If true, a ServiceAccount will be created
+  enabled: true  
+  # -- Name of the ServiceAccount. If left empty, the release name will be used.
+  name: "frontend-test"  
+  # -- Annotations to add to the ServiceAccount
+  annotations: {} 

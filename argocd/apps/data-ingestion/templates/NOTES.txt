@@ -1,0 +1,8 @@
+SUCCESSFULLY INSTALLED APPLICATION
+
+
+The application has been successfully installed and is now up and running.
+
+The application is now ready for use and has been configured with the necessary environment settings.
+
+Thank you for using our application!

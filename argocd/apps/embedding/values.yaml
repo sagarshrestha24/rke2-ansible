@@ -1,0 +1,98 @@
+# -- Number of replicas for the deployment
+replicaCount: 1  
+
+image:
+  # -- Container image repository
+  repository: savannah.ornl.gov/kdi/coreii-data-lake/embedding-service  
+  # -- Always pull the latest image when deploying
+  pullPolicy: Always  
+  # -- Image tag to use; defaults to "latest"
+  tag: "latest"  
+
+imagePullSecrets:
+  # -- Secret used for pulling the image from a private registry
+  - name: savannah-creds  
+
+service:
+  # -- Port on the container to forward traffic to
+  targetport: 8000  
+  # -- Exposes the service internally within the cluster
+  type: ClusterIP  
+  # -- Port exposed for internal cluster communication
+  port: 80  
+
+ingress:
+  # -- Enables Ingress for external access
+  enabled: true  
+  annotations: 
+     # -- Ensures proper URL routing
+     nginx.ingress.kubernetes.io/rewrite-target: /  
+  hosts:
+    - host: embedding.caiser.ornlkdi.org  
+      paths:
+        - path: /
+          # -- Matches all paths under "/"
+          pathType: Prefix  
+  # -- TLS configuration (empty means no TLS enabled)
+  tls: []  
+
+minio:
+  # -- MinIO endpoint for object storage
+  endpoint: http://minio.caiser.ornlkdi.org  
+  # -- Kubernetes secret containing MinIO credentials
+  secretName: minio-keys  
+  # -- Name of the MinIO bucket used
+  bucketName: all-minilm-l6-v2  
+
+
+vllm:
+  # -- Configuration for vLLM key-value cache space
+  kvcache_space: "40"  
+  # -- Specifies which CPU cores to bind OpenMP threads to
+  omp_threads_bind: "0-15"  
+
+resources:
+  limits:
+    # -- Maximum CPU allocated per pod
+    cpu: "4"  
+    # -- Maximum memory allocated per pod
+    memory: "8Gi"  
+  requests:
+    # -- Minimum CPU requested
+    cpu: "2"  
+    # -- Minimum memory requested
+    memory: "4Gi"  
+
+# -- Enables Pod Disruption Budget to prevent excessive pod disruptions
+pdb:
+  enabled: true  
+
+autoscaling:
+  # -- Enables Horizontal Pod Autoscaler
+  enabled: true  
+  # -- Minimum number of replicas
+  minReplicas: 1  
+  # -- Maximum number of replicas
+  maxReplicas: 10  
+  # -- Scale up/down based on CPU utilization threshold
+  targetCPUUtilizationPercentage: 80  
+  # -- Scale up/down based on memory utilization threshold
+  targetMemoryUtilizationPercentage: 80  
+
+
+serviceAccount:
+  # -- If true, a ServiceAccount will be created
+  enabled: true  
+  # -- Name of the ServiceAccount. If left empty, the release name will be used.
+  name: ""  
+  # -- Annotations to add to the ServiceAccount
+  annotations: {}  
+
+secret:
+  enabled: true
+    # -- MinIO access key
+  accessKey: bWluaW8=  
+  # -- MinIO secret key (should be stored securely, not in plain text)
+  secretKey: SmRGUGEzQlNIRThwZzV5TmpMNnFHRDJ4  
+  # -- Kubernetes secret containing MinIO credentials
+  Name: minio-keys 

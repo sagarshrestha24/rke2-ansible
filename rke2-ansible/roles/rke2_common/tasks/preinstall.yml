@@ -1,0 +1,14 @@
+---
+- name: Install iscsi-initiator-utils on RKE2 server and agent nodes
+  package:
+    name: iscsi-initiator-utils
+    state: present
+  when: inventory_hostname in groups['rke2_servers'] or inventory_hostname in groups['rke2_agents']
+- name: Enable and start iscsid service
+  service:
+     name: iscsid
+     state: started
+     enabled: yes
+  when: inventory_hostname in groups['rke2_servers'] or inventory_hostname in groups['rke2_agents']
+
+

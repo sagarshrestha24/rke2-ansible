@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kong-ingress
+  namespace: argocd
+spec:
+  destination:
+    name: ''
+    namespace: kong
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: argocd/apps/ingress
+    repoURL: 'git@github.com:01cloud/inl-infra.git'
+    targetRevision: HEAD
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

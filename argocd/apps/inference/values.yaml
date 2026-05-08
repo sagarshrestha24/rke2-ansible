@@ -1,0 +1,88 @@
+# -- Number of replicas for the deployment
+replicaCount: 1  
+
+image:
+  # -- Container image repository
+  repository: savannah.ornl.gov/kdi/coreii-data-lake/inference-service  
+  # -- Always pull the latest image when deploying
+  pullPolicy: Always  
+  # -- Image tag to use; defaults to "latest"
+  tag: "latest"  
+
+imagePullSecrets: 
+  # -- Secret used for pulling the image from a private registry
+  - name: savannah-creds  
+
+service:
+  # -- Type of Kubernetes service (ClusterIP means internal communication only)
+  type: ClusterIP  
+  # -- Port exposed for internal cluster communication
+  port: 80  
+  # -- Port on the container to forward traffic to
+  targetport: 8000  
+
+ingress:
+  # -- Enables Ingress for external access
+  enabled: true  
+  annotations: {}  # -- Add necessary ingress annotations if needed
+  hosts:
+    - host: inference.caiser.ornlkdi.org  
+      paths:
+        - path: /
+          # -- Matches all paths under "/"
+          pathType: Prefix  
+  tls: []  
+  # -- TLS configuration (currently empty, but can be configured as needed)
+
+minio:
+  # -- MinIO storage endpoint for accessing object storage
+  endpoint: http://minio.caiser.ornlkdi.org  
+  
+  # -- Name of the bucket where inference data is stored
+  bucketName: llama-3.2-1b-instruct  
+    
+
+secret:
+  enabled: true
+  # -- Base64-encoded MinIO access key
+  accessKey: bWluaW8=  
+  # -- Base64-encoded MinIO secret key
+  secretKey: SmRGUGEzQlNIRThwZzV5TmpMNnFHRDJ4
+  # -- Kubernetes secret name containing MinIO credentials
+  secretName: minio-keys  
+  
+resources: 
+   limits:
+     # -- Maximum CPU allocated per pod
+     cpu: 10  
+     # -- Maximum memory allocated per pod
+     memory: 20Gi  
+   requests:
+     # -- Minimum CPU requested for the pod
+     cpu: 2  
+     # -- Minimum memory requested for the pod
+     memory: 12Gi  
+
+# -- Enables Pod Disruption Budget to prevent excessive pod disruptions
+pdb:
+  enabled: true  
+
+autoscaling:
+  # -- Enables Horizontal Pod Autoscaler
+  enabled: true  
+  # -- Minimum number of replicas
+  minReplicas: 1  
+  # -- Maximum number of replicas
+  maxReplicas: 10  
+  # -- Scale up/down based on CPU utilization threshold
+  targetCPUUtilizationPercentage: 80  
+  # -- Scale up/down based on memory utilization threshold
+  targetMemoryUtilizationPercentage: 80  
+
+serviceAccount:
+  # -- If true, a ServiceAccount will be created
+  enabled: true  
+  # -- Name of the ServiceAccount. If left empty, the release name will be used.
+  name: "inference"  
+  # -- Annotations to add to the ServiceAccount
+  annotations: {}  

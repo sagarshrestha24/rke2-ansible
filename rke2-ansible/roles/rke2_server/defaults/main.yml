@@ -1,0 +1,2 @@
+---
+kubernetes_api_server_host: "rke-lb.labenv.ai"

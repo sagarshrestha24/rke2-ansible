@@ -1,0 +1,13 @@
+{{- if .Values.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "portal-db.fullname" . }}
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: portal-db
+      {{- include "portal-db.selectorLabels" . | nindent 6 }}
+
+{{- end }}

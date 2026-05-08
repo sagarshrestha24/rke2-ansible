@@ -1,0 +1,13 @@
+{{- if .Values.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "inference.fullname" . }}
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: inference
+      {{- include "inference.selectorLabels" . | nindent 6 }}
+
+{{- end }}

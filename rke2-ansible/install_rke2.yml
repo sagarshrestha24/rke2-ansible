@@ -1,0 +1,7 @@
+---
+- name: Playbook for hostname Setup
+  import_playbook: playbooks/hostnames.yml
+- name: Playbook for rke2-ansible
+  import_playbook: playbooks/site.yml
+- name: Playbook for ArgoCD Install
+  import_playbook: playbooks/argocd.yml

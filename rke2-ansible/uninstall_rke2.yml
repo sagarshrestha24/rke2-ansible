@@ -1,0 +1,7 @@
+---
+- name: Uninstall RKE2 from all servers and agents
+  hosts: rke2_cluster
+  become: yes
+  roles:
+    - rke2_uninstall
+

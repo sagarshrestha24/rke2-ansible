@@ -1,0 +1,13 @@
+{{- if .Values.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "kg-api.fullname" . }}
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: kg-api
+      {{- include "kg-api.selectorLabels" . | nindent 6 }}
+
+{{- end }}

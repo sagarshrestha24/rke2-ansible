@@ -1,0 +1,17 @@
+templates:
+  - service.yaml
+tests:
+  - it: "should render a Service resource"
+    asserts:
+      - isKind:
+          of: Service
+  - it: "should have a non-empty metadata.name"
+    asserts:
+      - notEqual:
+          path: metadata.name
+          value: ""
+  - it: "should have proper labels assigned"
+    asserts:
+      - equal:
+          path: spec.selector.app
+          value: kg-api

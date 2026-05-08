@@ -1,0 +1,32 @@
+- name: Install ArgoCD
+  shell: "export KUBECONFIG={{ kubeconfig_path }} && {{ helm_path }} upgrade -i argocd {{ role_path }}/templates/argo-cd --namespace argocd --create-namespace"
+
+- name: Wait for ArgoCD installation to complete
+  shell: "export KUBECONFIG={{ kubeconfig_path }} && /usr/local/bin/kubectl rollout status deployment/argocd-server -n argocd"
+  retries: 5
+  delay: 15
+  register: rollout_status
+  until: rollout_status.rc == 0
+  delegate_to: localhost
+- name: Sleep for 30 seconds
+  pause:
+    seconds: 30
+- name: Apply ArgoCD Git Secret Manifest
+  template:
+    src: argocd-git-secret.yaml.j2
+    dest: /tmp/argocd-git-secret.yaml
+  delegate_to: localhost
+
+- name: Apply the Git repository secret to ArgoCD
+  shell: "export KUBECONFIG={{ kubeconfig_path }} && /usr/local/bin/kubectl apply -f /tmp/argocd-git-secret.yaml"
+  delegate_to: localhost
+
+- name: Apply ArgoCD Apps of Apps Manifest
+  template:
+    src: argocd-app.yaml.j2
+    dest: /tmp/argocd-app.yaml
+  delegate_to: localhost
+
+- name: Apply the ArgoCD Apps
+  shell: "export KUBECONFIG={{ kubeconfig_path }} && /usr/local/bin/kubectl apply -f /tmp/argocd-app.yaml"
+  delegate_to: localhost

@@ -1,0 +1,97 @@
+# -- Number of replicas for the deployment
+replicaCount: 2  
+
+image:
+  # -- Container image repository
+  repository: savannah.ornl.gov/kdi/coreii-data-lake/kg_api  
+  # -- Always pull the latest image when deploying
+  pullPolicy: Always  
+  # -- Image tag to use; defaults to "latest"
+  tag: "latest"  
+
+imagePullSecrets: 
+  # -- Secret used for pulling the image from a private registry
+  - name: savannah-creds  
+
+service:
+  # -- Type of Kubernetes service (ClusterIP means internal communication only)
+  type: ClusterIP  
+  # -- Port exposed for internal cluster communication
+  port: 80  
+  # -- Port on the container to forward traffic to
+  targetport: 8001  
+
+ingress:
+  # -- Enables Ingress for external access
+  enabled: true  
+  annotations: 
+    # -- Ensures proper URL routing
+    nginx.ingress.kubernetes.io/rewrite-target: /  
+  hosts:
+    - host: kg-api.caiser.ornlkdi.org  
+      paths:
+        - path: /
+          # -- Matches all paths under "/"
+          pathType: Prefix  
+  tls:
+    - hosts:
+        - kg-api.caiser.ornlkdi.org  
+      # -- Secret name for storing TLS certificates
+      secretName: tls  
+
+kgApi:
+  # -- Machine Learning API service URL within the cluster
+  mlApiUrl: "http://ml-api.api.svc.cluster.local/"  
+  # -- Vector length for API processing
+  vectorLength: 384  
+  # -- Port number on which the service runs
+  port: 8001  
+  db:
+    # -- Kubernetes Secret containing database credentials
+    secretName: hippo-pguser-rhino  
+
+# -- Enables Pod Disruption Budget to prevent excessive pod disruptions
+pdb:
+  enabled: true  
+
+autoscaling:
+  # -- Enables Horizontal Pod Autoscaler
+  enabled: true  
+  # -- Minimum number of replicas
+  minReplicas: 2  
+  # -- Maximum number of replicas
+  maxReplicas: 10  
+  # -- Scale up/down based on CPU utilization threshold
+  targetCPUUtilizationPercentage: 80  
+  # -- Scale up/down based on memory utilization threshold
+  targetMemoryUtilizationPercentage: 80  
+
+secret:
+  # -- Enables Secrets
+  enabled: true
+  # -- Secret name in Kubernetes for database access
+  name: hippo-pguser-rhino  
+  # -- Base64-encoded database name
+  dbname: Y29yZWlpX2tub3dsZWRnZWdyYXBo  
+  # -- Base64-encoded database host
+  host: aGlwcG8tcHJpbWFyeS5wZ28uc3Zj  
+  # -- Base64-encoded JDBC URI for PostgreSQL connection
+  jdbcUri: amRiYzpwb3N0Z3Jlc3FsOi8vaGlwcG8tcHJpbWFyeS5wZ28uc3ZjOjU0MzIvY29yZWlpX2tub3dsZWRnZWdyYXBoP3Bhc3N3b3JkPVdmVjU4amdxSVNYYmF4bDBEbEY3YzBsMSZ1c2VyPXJoaW5v  
+  # -- Base64-encoded database password
+  password: V2ZWNThqZ3FJU1hiYXhsMERsRjdjMGwx  
+  # -- Base64-encoded database port
+  port: NTQzMg==  
+  # -- Base64-encoded URI for connecting to the PostgreSQL database
+  uri: cG9zdGdyZXNxbDovL3JoaW5vOldmVjU4amdxSVNYYmF4bDBEbEY3YzBsMUBoaXBwby1wcmltYXJ5LnBnby5zdmM6NTQzMi9jb3JlaWlfa25vd2xlZGdlZ3JhcGg=  
+  # -- Base64-encoded database user
+  user: cmhpbm8=  
+  # -- Base64-encoded SCRAM-SHA-256 verifier
+  verifier: U0NSQU0tU0hBLTI1NiQ0MDk2OnJyUlpKMGZkWUtaU1FZekhJS3ZwUkE9PSRKQWt3c2lGZVlXdWM2VGRIL1crWTFDNGpPWkVnUkpnTHBoeWQ2N3JEZHRjPTpzNGFMeXFySG5CeHJYTkxodG1FdmxJc3p0V0ZHWVI1UktzK1lXeUYyU1BRPQ==  
+
+serviceAccount:
+  # -- If true, a ServiceAccount will be created
+  enabled: true  
+  # -- Name of the ServiceAccount. If left empty, the release name will be used.
+  name: "kg-api"  
+  # -- Annotations to add to the ServiceAccount
+  annotations: {}  

@@ -1,0 +1,71 @@
+- name: Set up kubeconfig and install ArgoCD
+  hosts: rke2_servers
+  become: yes
+  vars:
+    master_node_ip: "{{ hostvars['localhost']['kubernetes_api_server_host'] }}"
+    kubeconfig_path: "{{ hostvars['localhost']['kubeconfig_path'] }}"
+  tasks:
+    - name: Copy kubeconfig from remote server to Ansible host (local)
+      ansible.builtin.fetch:
+        src: /etc/rancher/rke2/rke2.yaml
+        dest: "{{ kubeconfig_path }}"
+        flat: yes
+      register: fetch_result
+
+    - name: Display fetch result for debugging
+      ansible.builtin.debug:
+        var: fetch_result
+
+    - name: Verify kubeconfig file was copied successfully on localhost
+      ansible.builtin.stat:
+        path: "{{ kubeconfig_path }}"
+      register: kubeconfig_stat
+      run_once: true
+      delegate_to: localhost
+
+    - name: Display kubeconfig_stat result for debugging
+      ansible.builtin.debug:
+        var: kubeconfig_stat
+
+    - name: Fail if kubeconfig file was not copied
+      ansible.builtin.fail:
+        msg: "Kubeconfig file was not found at {{ kubeconfig_path }}"
+      when: not kubeconfig_stat.stat.exists
+
+    - name: Update server IP in kubeconfig using sed
+      ansible.builtin.shell: >
+        sed -i 's|server: https://.*:6443|server: https://{{ master_node_ip }}:6443|' {{ kubeconfig_path }}
+      register: sed_result
+      when: kubeconfig_stat.stat.exists
+      delegate_to: localhost
+
+    - name: Display sed command result
+      ansible.builtin.debug:
+        var: sed_result
+- name: Install Helm and ArgoCD using Helm chart
+  hosts: localhost
+  become: yes
+  vars:
+    helm_version: "v3.10.2"
+    helm_path: "/usr/local/bin/helm"
+    kubeconfig_path: "{{ hostvars['localhost']['kubeconfig_path'] }}"
+    values_file_path: "{{ hostvars['localhost']['values_file_path'] }}"
+  pre_tasks:
+    - name: Check if Helm is already installed
+      ansible.builtin.command: "helm version --short"
+      register: helm_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Install Helm if not present
+      ansible.builtin.shell: |
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh --version {{ helm_version }}
+        rm -f get_helm.sh
+      when: helm_check.failed
+      changed_when: true
+    - name: Install ArgoCD via Helm
+      import_role:
+        name: argocd-install
+ 

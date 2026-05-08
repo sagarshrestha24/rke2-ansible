@@ -1,0 +1,30 @@
+---
+- name: Install NGINX
+  ansible.builtin.yum:
+    name: nginx
+    state: present
+
+- name: Install NGINX Stream Module
+  ansible.builtin.yum:
+    name: nginx-mod-stream
+    state: present
+
+- name: Disable SELinux temporarily
+  ansible.builtin.command: setenforce 0
+  when: ansible_selinux.status == "enabled"
+
+- name: Copy NGINX configuration for load balancing
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart NGINX
+
+- name: Start and enable NGINX
+  ansible.builtin.systemd:
+    name: nginx
+    enabled: true
+    state: started
+

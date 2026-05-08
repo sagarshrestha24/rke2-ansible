@@ -1,0 +1,51 @@
+# -- Image pull secrets for accessing private registries
+imagePullSecrets: 
+  - name: savannah-creds  
+
+cronJob:
+  # -- Name of the CronJob
+  name: data-ingestion  
+
+  # -- Cron schedule (midnight every day)
+  schedule: "0 0 * * *"  
+
+  # -- Timezone for scheduling
+  timeZone: "America/New_York"  
+
+  # -- Number of retries before marking as failed
+  backoffLimit: 1  
+
+  image:
+    # -- Repository for the data ingestion image
+    repository: savannah.ornl.gov/kdi/coreii-data-lake/data_ingestion  
+    # -- Image tag (set to latest)
+    tag: latest  
+    # -- Image pull policy (Always pull latest image)
+    pullPolicy: Always  
+
+  configMap:
+    # -- ConfigMap for environment variables and paths
+    name: data-ingestion-cm  
+    data:
+      RAW_DATA_DIRECTORY_ARC: /code/datasets/ARC  
+      RAW_DATA_DIRECTORY_EIA: /code/datasets/EIA  
+      RAW_DATA_DIRECTORY_OSTI: /code/datasets/OSTI  
+      RAW_DATA_PATH_CYOTE_TABULAR: /code/datasets/Cyote/Cyote.csv  
+      RAW_DATA_DIRECTORY_CYOTE_REPORTS: /code/datasets/Cyote  
+      RAW_DATA_DIRECTORY_CISA: /code/cisa-clone  
+      SEED_DATA_PATH: /code/datasets/SEED_DATA.json  
+      
+      # -- CISA Data Sources
+      CISA_GIT_DOWNLOAD_URL: https://github.com/cisagov/CSAF/archive/refs/heads/develop.zip  
+      CISA_BASE_GIT_URL: https://raw.githubusercontent.com/cisagov/CSAF/refs/heads/develop/csaf_files/OT/white/  
+      CISA_PATH: CSAF-develop  
+
+      # -- MinIO Storage Configuration
+      MINIO_ENDPOINT: minio.minio.svc.cluster.local  
+      BUCKET_NAME: datasets  
+
+      # -- Machine Learning API URL
+      ML_API_URL: http://ml-api.api.svc.cluster.local/  
+
+      # -- Enable or disable OSTI filtering
+      USE_OSTI_FILTER: "True"  

@@ -1,0 +1,40 @@
+suite: Test Deployment Template
+templates:
+  - deployment.yaml
+tests:
+  - it: "should render a Deployment resource"
+    asserts:
+      - isKind:
+          of: Deployment
+  - it: "should have a non-empty metadata.name"
+    asserts:
+      - notEqual:
+          path: metadata.name
+          value: ""
+  - it: "should have proper labels assigned"
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: inference
+  - it: "should set CPU and memory requests correctly"
+    set:
+      resources.requests.cpu: "2"
+      resources.requests.memory: "12Gi"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: "2"
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: "12Gi"
+  - it: "should set CPU and memory limits correctly"
+    set:
+      resources.limits.cpu: "10"
+      resources.limits.memory: "20Gi"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: "10"
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: "20Gi"

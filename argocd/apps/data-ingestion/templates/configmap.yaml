@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.cronJob.configMap.name }}
+data:
+  {{- range $key, $value := .Values.cronJob.configMap.data }}
+  {{ $key }}: {{ $value }}
+  {{- end }}

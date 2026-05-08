@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.cronJob.name }}
+spec:
+  schedule: {{ .Values.cronJob.schedule }}
+  timeZone: {{ .Values.cronJob.timeZone }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+              {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - image: "{{ .Values.cronJob.image.repository }}:{{ .Values.cronJob.image.tag }}"
+              imagePullPolicy: {{ .Values.cronJob.image.pullPolicy }}
+              name: data-ingestion
+              env:
+                - name: DB_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: hippo-pguser-rhino
+                      key: dbname
+                - name: DB_PORT
+                  valueFrom:
+                    secretKeyRef:
+                      name: hippo-pguser-rhino
+                      key: port
+                - name: DB_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: hippo-pguser-rhino
+                      key: host
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: hippo-pguser-rhino
+                      key: user
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: hippo-pguser-rhino
+                      key: password
+                - name: MINIO_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-keys
+                      key: access_key
+                - name: MINIO_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-keys
+                      key: secret_key
+                - name: CISA_MIRROR_PRIVATE_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: git-creds-cisa
+                      key: pa
+              envFrom:
+                - configMapRef:
+                    name: {{ .Values.cronJob.configMap.name }}
+            

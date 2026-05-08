@@ -1,0 +1,102 @@
+# -- Number of replicas for the deployment
+replicaCount: 2  
+
+image:
+  # -- Container image repository
+  repository: savannah.ornl.gov/kdi/coreii-data-lake/ml_api  
+  # -- Always pull the latest image when deploying
+  pullPolicy: Always  
+  # -- Image tag to use; defaults to "latest"
+  tag: "latest"  
+
+imagePullSecrets: 
+  # -- Secret used for pulling the image from a private registry
+  - name: savannah-creds  
+
+service:
+  # -- Port exposed for internal cluster communication
+  targetport: 8000  
+  # -- Type of Kubernetes service (ClusterIP means internal communication only)
+  type: ClusterIP  
+  # -- Port exposed within the cluster
+  port: 80  
+
+ingress:
+  # -- Enables Ingress for external access
+  enabled: true  
+  annotations: 
+    # -- Ensures proper URL routing
+    nginx.ingress.kubernetes.io/rewrite-target: /  
+  hosts:
+    - host: ml-api.caiser.ornlkdi.org  
+      paths:
+        - path: /
+          # -- Matches all paths under "/"
+          pathType: Prefix  
+  tls:
+    - hosts:
+        - ml-api.caiser.ornlkdi.org  
+      # -- Secret name for storing TLS certificates
+      secretName: tls  
+
+resources: 
+  limits:
+    # -- CPU limit for the container
+    cpu: 100m  
+    # -- Memory limit for the container
+    memory: 250Mi  
+  requests:
+    # -- Minimum CPU request for scheduling
+    cpu: 50m  
+    # -- Minimum memory request for scheduling
+    memory: 128Mi  
+
+autoscaling:
+  # -- Enables Horizontal Pod Autoscaler
+  enabled: true  
+  # -- Minimum number of replicas
+  minReplicas: 1  
+  # -- Maximum number of replicas
+  maxReplicas: 100  
+  # -- Scale up/down based on CPU utilization threshold
+  targetCPUUtilizationPercentage: 80  
+  # -- Scale up/down based on memory utilization threshold
+  targetMemoryUtilizationPercentage: 80  
+
+# -- Enables Pod Disruption Budget to prevent excessive pod disruptions
+pdb:
+  enabled: true  
+
+mlApi:
+  # -- Port on which the ML API service runs
+  port: 8000  
+  # -- Source of the LLM (Language Model)
+  llmSource: "BEDROCK"  
+  # -- Source of embeddings
+  embeddingSource: "VLLM"  
+  # -- URL for the LLM service
+  llmServiceUrl: "http://inference.inference.svc.cluster.local/v1"  
+  # -- URL for the embedding service
+  embeddingServiceUrl: "http://embedding.embedding.svc.cluster.local/v1"  
+  # -- Whether the service should work without LLM
+  useWithoutLlm: "False"  
+  # -- Secret name for AWS credentials
+  awsSecretName: aws-keys  
+
+secret:
+  # -- Enables Secret
+  enabled: true
+  # -- Kubernetes Secret name for AWS credentials
+  name: aws-keys  
+  # -- Base64-encoded AWS Access Key ID
+  awsAccessKeyId: QUtJQVRXUVg3T0NITkZNS1pXT1o=  
+  # -- Base64-encoded AWS Secret Access Key
+  awsSecretAccessKey: cmlNYmEzdmc3b0pEQmt5c0ZpMjRPQitkTjgxUU5yTzdyVzBzb2w1NQ==  
+
+serviceAccount:
+  # -- If true, a ServiceAccount will be created
+  enabled: true  
+  # -- Name of the ServiceAccount. If left empty, the release name will be used.
+  name: "ml-api"  
+  # -- Annotations to add to the ServiceAccount
+  annotations: {}  

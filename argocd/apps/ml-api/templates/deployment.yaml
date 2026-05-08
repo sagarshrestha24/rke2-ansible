@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ml-api.fullname" . }}
+  labels:
+    {{- include "ml-api.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  serviceAccountName: {{ .Values.serviceAccount.name | default .Release.Name }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ml-api
+      {{- include "ml-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: ml-api
+        {{- include "ml-api.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - ml-api
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: ML_API_PORT
+              value: "{{ .Values.mlApi.port }}"
+            - name: LLM_SOURCE
+              value: "{{ .Values.mlApi.llmSource }}"
+            - name: EMBEDDING_SOURCE
+              value: "{{ .Values.mlApi.embeddingSource }}"
+            - name: VLLM_LLM_SERVICE_URL
+              value: "{{ .Values.mlApi.llmServiceUrl }}"
+            - name: VLLM_EMBEDDING_SERVICE_URL
+              value: "{{ .Values.mlApi.embeddingServiceUrl }}"
+            - name: USE_WITHOUT_LLM
+              value: "{{ .Values.mlApi.useWithoutLlm }}"
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mlApi.awsSecretName }}
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mlApi.awsSecretName }}
+                  key: aws-secret-access-key
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.targetport }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.targetport }}
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetport }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

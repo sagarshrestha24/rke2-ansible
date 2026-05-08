@@ -1,0 +1,112 @@
+# prometheus-postgres-exporter
+
+![Version: 6.8.1](https://img.shields.io/badge/Version-6.8.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.16.0](https://img.shields.io/badge/AppVersion-v0.16.0-informational?style=flat-square)
+
+A Helm chart for prometheus postgres-exporter
+
+**Homepage:** <https://github.com/prometheus-community/postgres_exporter>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| gianrubio | <gianrubio@gmail.com> |  |
+| zanhsieh | <zanhsieh@gmail.com> |  |
+| zeritti | <rootsandtrees@posteo.de> |  |
+
+## Source Code
+
+* <https://github.com/prometheus-community/postgres_exporter>
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity | object | `{}` |  |
+| annotations | object | `{}` |  |
+| automountServiceAccountToken | bool | `false` |  |
+| command | list | `[]` |  |
+| config.datasource.database | string | `"zoo"` |  |
+| config.datasource.extraParams | string | `""` |  |
+| config.datasource.host | string | `"hippo-primary.pgo.svc"` |  |
+| config.datasource.password | string | `"g3^.e5X=V[JmcX8tu}0|pR-l"` |  |
+| config.datasource.passwordFile | string | `""` |  |
+| config.datasource.passwordSecret | object | `{}` |  |
+| config.datasource.pgpassfile | string | `""` |  |
+| config.datasource.port | string | `"5432"` |  |
+| config.datasource.sslmode | string | `"disable"` |  |
+| config.datasource.user | string | `"rhino"` |  |
+| config.datasource.userFile | string | `""` |  |
+| config.datasource.userSecret | object | `{}` |  |
+| config.datasourceSecret | string | `nil` |  |
+| config.disableCollectorBgwriter | bool | `false` |  |
+| config.disableCollectorDatabase | bool | `false` |  |
+| config.disableDefaultMetrics | bool | `false` |  |
+| config.disableSettingsMetrics | bool | `false` |  |
+| config.existingSecret.enabled | bool | `false` |  |
+| config.existingSecret.name | string | `""` |  |
+| config.extraArgs | list | `[]` |  |
+| config.logFormat | string | `""` |  |
+| config.logLevel | string | `""` |  |
+| config.postgresExporter | string | `""` |  |
+| deployment.annotations | object | `{}` |  |
+| deployment.labels | object | `{}` |  |
+| extraContainers | list | `[]` |  |
+| extraEnvs | list | `[]` |  |
+| extraManifests | list | `[]` |  |
+| extraVolumeMounts | list | `[]` |  |
+| extraVolumes | list | `[]` |  |
+| hostAliases | list | `[]` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.registry | string | `"quay.io"` |  |
+| image.repository | string | `"prometheuscommunity/postgres-exporter"` |  |
+| image.tag | string | `""` |  |
+| initContainers | list | `[]` |  |
+| livenessProbe.httpGet.path | string | `"/"` |  |
+| livenessProbe.httpGet.port | string | `"http"` |  |
+| livenessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| livenessProbe.timeoutSeconds | int | `3` |  |
+| networkPolicy.enabled | bool | `false` |  |
+| networkPolicy.labels | object | `{}` |  |
+| nodeSelector | object | `{}` |  |
+| podDisruptionBudget.enabled | bool | `false` |  |
+| podDisruptionBudget.maxUnavailable | int | `1` |  |
+| podLabels | object | `{}` |  |
+| podSecurityContext.runAsGroup | int | `1001` |  |
+| podSecurityContext.runAsNonRoot | bool | `true` |  |
+| podSecurityContext.runAsUser | int | `1001` |  |
+| podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| priorityClassName | string | `""` |  |
+| prometheusRule.additionalLabels | object | `{}` |  |
+| prometheusRule.enabled | bool | `false` |  |
+| prometheusRule.namespace | string | `""` |  |
+| prometheusRule.rules | list | `[]` |  |
+| rbac.create | bool | `true` |  |
+| readinessProbe.httpGet.path | string | `"/"` |  |
+| readinessProbe.httpGet.port | string | `"http"` |  |
+| readinessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| readinessProbe.timeoutSeconds | int | `1` |  |
+| replicaCount | int | `1` |  |
+| resources | object | `{}` |  |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.privileged | bool | `false` |  |
+| securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| service.annotations | object | `{}` |  |
+| service.labels | object | `{}` |  |
+| service.name | string | `"http"` |  |
+| service.port | int | `80` |  |
+| service.targetPort | int | `9187` |  |
+| service.type | string | `"ClusterIP"` |  |
+| serviceAccount.annotations | object | `{}` |  |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.name | string | `nil` |  |
+| serviceMonitor.enabled | bool | `false` |  |
+| serviceMonitor.multipleTarget.enabled | bool | `false` |  |
+| serviceMonitor.multipleTarget.sharedAuthModule.enabled | bool | `false` |  |
+| serviceMonitor.multipleTarget.sharedAuthModule.name | string | `""` |  |
+| serviceMonitor.multipleTarget.targets | list | `[]` |  |
+| tolerations | list | `[]` |  |
+
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

@@ -1,0 +1,18 @@
+annotations:
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: Application Source
+      url: https://github.com/yonahd/kor
+    - name: Chart Source
+      url: https://github.com/yonahd/kor/tree/main/charts/kor
+    - name: Grafana Dashboard
+      url: https://grafana.com/grafana/dashboards/19863-kor-dashboard/
+apiVersion: v2
+appVersion: 0.6.1
+description: A Kubernetes Helm Chart to discover orphaned resources using kor
+maintainers:
+- name: yonahd
+  url: https://github.com/yonahd/kor
+name: kor
+type: application
+version: 0.2.0

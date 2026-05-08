@@ -1,0 +1,49 @@
+### Helm Chart for PostgreSQL
+
+#### Usage
+1. **Prerequisites:**
+   - Ensure Kubernetes cluster is up and running.
+   - Install Helm (version 3+).
+
+2. **Install the Chart:**
+   ```bash
+   helm install postgres ./postgres-chart
+   ```
+
+3. **Verify Deployment:**
+   - Check resources:
+     ```bash
+     kubectl get all
+     ```
+   - Inspect logs:
+     ```bash
+     kubectl logs -l app=postgres-chart
+     ```
+
+4. **Customize Configuration:**
+   - Update `values.yaml` for custom configurations:
+     - `POSTGRES_PASSWORD`: Database password.
+     - `POSTGRES_USER`: Database username.
+     - `POSTGRES_DB`: Database name.
+     - Storage and resource configurations.
+
+5. **Access the Database:**
+   - Port-forward the PostgreSQL service:
+     ```bash
+     kubectl port-forward svc/my-postgres 5432:5432
+     ```
+   - Connect to PostgreSQL using a client:
+     ```bash
+     psql -h localhost -U <POSTGRES_USER> -d <POSTGRES_DB>
+     ```
+     The password is as defined in `values.yaml`.
+
+6. **Uninstall the Chart:**
+   ```bash
+   helm uninstall postgres
+   ```
+
+#### Notes:
+- Persistent storage ensures data retention across restarts.
+- Secrets are used for secure password management.
+- Modify the `service.type` in `values.yaml` to expose the database externally if required (use with caution).

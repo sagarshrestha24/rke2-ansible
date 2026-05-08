@@ -1,0 +1,6 @@
+# roles/argocd_install/vars/main.yml
+argocd_namespace: argocd
+argocd_chart: argo/argo-cd
+argocd_chart_version: 5.5.1  # Update to the latest version as needed
+argocd_release_name: argocd
+

@@ -1,0 +1,40 @@
+suite: Test Deployment Template
+templates:
+  - deployment.yaml
+tests:
+  - it: "should render a Deployment resource"
+    asserts:
+      - isKind:
+          of: Deployment
+  - it: "should have a non-empty metadata.name"
+    asserts:
+      - notEqual:
+          path: metadata.name
+          value: ""
+  - it: "should have proper labels assigned"
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: portal-db
+  - it: "should set CPU and memory requests correctly"
+    set:
+      resources.requests.cpu: "50m"
+      resources.requests.memory: "1.5Gi"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: "50m"
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: "1.5Gi"
+  - it: "should set CPU and memory limits correctly"
+    set:
+      resources.limits.cpu: "100m"
+      resources.limits.memory: "3Gi"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: "100m"
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: "3Gi"

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.nginx.configName }}
+  labels:
+    app: frontend
+    {{- include "frontend.labels" . | nindent 4 }}
+data:
+  default.conf: |
+    {{ .Values.nginx.defaultConf | nindent 4 }}

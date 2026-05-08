@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "portal-api.fullname" . }}
+  labels:
+    {{- include "portal-api.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  serviceAccountName: {{ .Values.serviceAccount.name | default .Release.Name }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: portal-api
+      {{- include "portal-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: portal-api
+        {{- include "portal-api.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - portal-api
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: SQL_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mssql-creds
+                  key: password
+            - name: SQL_API_URL
+              value: portal-db.sqlserver.svc.cluster.local
+            - name: SQL_API_PORT
+              value: "1433"
+            - name: LDAP_SERVER
+              valueFrom:
+                secretKeyRef:
+                  name: ldap-creds
+                  key: ldap-server
+            - name: MSA_ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: ldap-creds
+                  key: msa-account
+            - name: MSA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ldap-creds
+                  key: msa-password
+            - name: SEARCH_DN
+              valueFrom:
+                secretKeyRef:
+                  name: ldap-creds
+                  key: search-dn
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.targetport }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.targetport }}
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetport }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

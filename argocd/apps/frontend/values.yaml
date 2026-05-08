@@ -1,0 +1,94 @@
+# -- Number of replicas for the deployment
+replicaCount: 1  
+
+image:
+  # -- Container image repository
+  repository: savannah.ornl.gov/kdi/coreii-data-lake/portalweb  
+  # -- Always pull the latest image when deploying
+  pullPolicy: Always  
+  # -- Image tag to use; defaults to "latest"
+  tag: "latest"  
+
+imagePullSecrets: 
+  # -- Secret used for pulling the image from a private registry
+  - name: savannah-creds  
+
+
+service:
+  # -- Type of Kubernetes service (ClusterIP means internal communication only)
+  type: ClusterIP  
+  # -- Port on which the service will be exposed
+  port: 80  
+
+ingress:
+  # -- Enables Ingress for external access
+  enabled: true  
+  annotations: 
+     # -- Ensures proper URL routing
+     nginx.ingress.kubernetes.io/rewrite-target: /  
+  hosts:
+    - host: coreii-portal.caiser.ornlkdi.org  
+      paths:
+        - path: /
+          # -- Matches all paths under "/"
+          pathType: Prefix  
+  tls:
+    - hosts:
+        # -- TLS configuration for secure HTTPS access
+        - coreii-portal.caiser.ornlkdi.org  
+      # -- Kubernetes secret containing TLS certificate
+      secretName: tls  
+
+resources:
+    requests:
+        # -- Minimum CPU requested for the pod
+        cpu: "100m"  
+        # -- Minimum memory requested for the pod
+        memory: "128Mi"  
+    limits:
+       # -- Maximum CPU allocated per pod
+       cpu: "200m"  
+       # -- Maximum memory allocated per pod
+       memory: "256Mi"  
+
+# -- Enables Pod Disruption Budget to prevent excessive pod disruptions
+pdb:
+  enabled: true  
+
+autoscaling:
+  # -- Enables Horizontal Pod Autoscaler
+  enabled: true  
+  # -- Minimum number of replicas
+  minReplicas: 1  
+  # -- Maximum number of replicas
+  maxReplicas: 10  
+  # -- Scale up/down based on CPU utilization threshold
+  targetCPUUtilizationPercentage: 80  
+  # -- Scale up/down based on memory utilization threshold
+  targetMemoryUtilizationPercentage: 80  
+
+nginx:
+  # -- Name of the ConfigMap storing nginx configuration
+  configName: nginx-config  
+  # -- Default Nginx server configuration for serving static files
+  defaultConf: |
+    server {
+        listen 80;
+        server_name coreii-portal.caiser.ornlkdi.org;
+
+        root /usr/share/nginx/html;
+        index index.html;
+
+        location / {
+            try_files $uri /index.html;
+        }
+        error_page 404 /index.html;
+    }
+
+serviceAccount:
+  # -- If true, a ServiceAccount will be created
+  enabled: true  
+  # -- Name of the ServiceAccount. If left empty, the release name will be used.
+  name: "frontend"  
+  # -- Annotations to add to the ServiceAccount
+  annotations: {}  

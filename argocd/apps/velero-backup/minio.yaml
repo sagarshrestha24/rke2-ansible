@@ -1,0 +1,15 @@
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: minio-backup
+spec:
+  includedNamespaces:
+    - minio
+  includedResources:
+    - "*"
+  labelSelector:
+    matchLabels:
+      app: minio
+  storageLocation: velero
+  snapshotVolumes: true
+  ttl: 72h

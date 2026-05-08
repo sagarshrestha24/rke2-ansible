@@ -1,0 +1,17 @@
+---
+- name: Uninstall RKE2
+  ansible.builtin.command: /usr/bin/rke2-uninstall.sh
+  register: uninstall_result
+  ignore_errors: true
+  become: true
+
+- name: Check if uninstallation was successful
+  ansible.builtin.debug:
+    msg: "Uninstallation successful on {{ inventory_hostname }}"
+  when: uninstall_result.rc == 0
+
+- name: Warn if uninstallation failed
+  ansible.builtin.debug:
+    msg: "Uninstallation failed on {{ inventory_hostname }}"
+  when: uninstall_result.rc != 0
+
